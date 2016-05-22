@@ -8,6 +8,7 @@ A basic asteroid shooter type game. LEFTARROW and RIGHTARROW to move the player 
 - Player
 - Enemy
 - Bullet
+- Flame
 
 #### Functions:
 - main
@@ -15,3 +16,11 @@ A basic asteroid shooter type game. LEFTARROW and RIGHTARROW to move the player 
 - showPoints
 - updateUnlocked
 - endGame
+
+# Requirements:
+
+### Python:
+- 3.x.x
+
+### Pygame:
+- 1.9.2a0
