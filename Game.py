@@ -213,7 +213,7 @@ def main():
 
                 #=CHEATING=====\
                 if event.key == K_UP:
-                    player.points += 25
+                    player.points += 75
                 #==============/
                 if event.key == K_RIGHT:
                     player.moveX(4)

@@ -3,9 +3,10 @@
 """
 
 #general housekeeping
-import pygame, math, random, Block, Bullet
+import pygame, math, random, Block, Bullet, Flame
 from Block import Block
 from Bullet import Bullet
+from Flame import Flame
 pygame.init()
 #window
 WINDOWWIDTH  = 720
@@ -224,16 +225,16 @@ class Player(Block):
                     self.timer += 1
                     flame = Flame(RED, 12, 12)
                     flame.load(self, bullets)
-                    bullet.aim(87, 3)
-                    bullet.fire(8, -1) #--1 ...fire(vel, acc)
+                    flame.aim(87, 3)
+                    flame.throw(16, -0.5)
                     flame = Flame(RED, 12, 12)
                     flame.load(self, bullets)
-                    bullet.aim(90, 3)
-                    bullet.fire(8, -1) #--2
+                    flame.aim(90, 3)
+                    flame.throw(16, -0.5)
                     flame = Flame(RED, 12, 12)
                     flame.load(self, bullets)
-                    bullet.aim(93, 3)
-                    bullet.fire(8, -1) #--3
+                    flame.aim(93, 3)
+                    flame.throw(16, -0.5)
 
             #lvl 3
             elif self.unlocked[2] == 3:

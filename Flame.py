@@ -1,4 +1,4 @@
-""" Bullet.py
+""" Flame.py
     by Ibrahim Sardar
 """
 
@@ -11,7 +11,7 @@ WINDOWWIDTH  = 720
 WINDOWHEIGHT = 380
 
 #Bullet
-class Bullet(Block):
+class Flame(Block):
     #initializer
     def __init__(self, color, w, h):
         #attributes
@@ -19,22 +19,29 @@ class Bullet(Block):
         self.setImage(w, h)
         self.color = color
         
-        self.dir   = 0
+        self.dir   = 0.0 #accurate angle
         self.x_acc = 0.0 #accurate x pos
         self.y_acc = 0.0 #accurate y pos
 
         self.event1 = False
-        self.xspeed = 0
-        self.yspeed = 0
+        self.xspeed = 0.0 #accurate x vel
+        self.yspeed = 0.0 #accurate y vel
+        self.xaccel = 0.0 #accurate x accel
+        self.yaccel = 0.0 #accurate y accel
 
     # --- other methods --- #
     def updateEvents(self):
         #movement
         if self.event1 == True:
+            #update accurate position
             self.x_acc += self.xspeed
             self.y_acc += self.yspeed
+            #update real position
             self.rect.x = self.x_acc
             self.rect.y = self.y_acc
+            #update speed
+            self.xspeed += self.xaccel
+            self.yspeed += self.yaccel
             #destroy if leaves window
             if(self.rect.left   > WINDOWWIDTH  or
                self.rect.right  < 0            or
@@ -48,23 +55,23 @@ class Bullet(Block):
         self.rect.centery = self.y_acc = yPos
 
     def load(self, block, group):
-        half = int(self.rect.width/2) - 1
-        xrnd = random.randint( block.rect.centerx - half, block.rect.centerx + half )
-        self.setCenterPos(xrnd, block.rect.centery)
+        self.setCenterPos(block.rect.centerx, block.rect.centery)
         group.add(self)
 
     def aim(self, angle, margin):
         #the big number allows many decimal places
-        margin = round(margin * 100000000)
-        angle  = round(angle * 100000000)
+        margin = margin * 100000000
+        angle = angle * 100000000
         self.dir = random.randint(angle-margin, angle+margin)/100000000
 
-    def fire(self, speed):
+    def throw(self, speed, yaccel):
         #convert angle to radians
         dir_rad = math.radians(self.dir)
         
         dx = math.cos(dir_rad) * speed
         dy = math.sin(dir_rad) * speed
+
+        self.yaccel = math.sin(dir_rad) * -yaccel
 
         self.moveX( dx )
         self.moveY( dy )
