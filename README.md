@@ -19,8 +19,8 @@ A basic asteroid shooter type game. LEFTARROW and RIGHTARROW to move the player 
 
 # Requirements:
 
-### Python:
+#### Python:
 - 3.x.x
 
-### Pygame:
+#### Pygame:
 - 1.9.2a0
