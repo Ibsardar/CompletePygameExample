@@ -1,5 +1,8 @@
-""" gameEx.py
+""" Game.py
     by Ibrahim Sardar
+
+    Python 3.3.5
+    Pygame 1.9.2a0
 """
 
 #load
@@ -217,7 +220,7 @@ def main():
                 elif event.key == K_LEFT:
                     player.moveX(-4)
                 if event.key == K_SPACE:
-                    """
+                    """  ~~~~~~~ JUNK ~~~~~~~~
                       "  |>  IF 0.25 SEC HAVE PASSED SINCE LAST SHOT:
                       " _______________________________
                       "| ~~~~~~~ create bullet ~~~~~~~ |
@@ -229,37 +232,9 @@ def main():
                       "| bullet speed:   6            //
                       "|____________________________///
                       "
-                      "
+                      "  ~~~~~~~ JUNK ~~~~~~~~
                     """
                     player.shoot( playerBullets, asteroids, fps )
-                    if bulletTimer == 0:
-                        """bulletTimer += 1
-                        bullet = Bullet(RED, 4, 8 )
-                        bullet.load(player, playerBullets)
-                        bullet.aim(90, 15)
-                        bullet.fire(8)
-
-                        bullet = Bullet(PURPLE, 4, 8 )
-                        bullet.load(player, playerBullets)
-                        bullet.aim(75, 15)
-                        bullet.fire(6)
-
-                        bullet = Bullet(FIRE, 4, 8 )
-                        bullet.load(player, playerBullets)
-                        bullet.aim(105, 15)
-                        bullet.fire(6)
-
-                        bullet = Bullet(BLUE, 4, 8 )
-                        bullet.load(player, playerBullets)
-                        bullet.aim(97, 15)
-                        bullet.fire(7)
-
-                        bullet = Bullet(GREEN, 4, 8 )
-                        bullet.load(player, playerBullets)
-                        bullet.aim(83, 15)
-                        bullet.fire(7)"""
-                        pass
-
                 if event.key == K_1:
                     player.selected = 0
                 elif event.key == K_2:
