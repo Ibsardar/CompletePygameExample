@@ -18,6 +18,7 @@ class Bullet(Block):
         pygame.sprite.Sprite.__init__(self)
         self.setImage(w, h)
         self.color = color
+        self.dmg = 0
         
         self.dir   = 0
         self.x_acc = 0.0 #accurate x pos
@@ -26,15 +27,22 @@ class Bullet(Block):
         self.event1 = False
         self.xspeed = 0
         self.yspeed = 0
+        self.xaccel = 0
+        self.yaccel = 0
 
     # --- other methods --- #
     def updateEvents(self):
         #movement
         if self.event1 == True:
+            #update accurate position
             self.x_acc += self.xspeed
             self.y_acc += self.yspeed
+            #update real position
             self.rect.x = self.x_acc
             self.rect.y = self.y_acc
+            #update speed
+            self.xspeed += self.xaccel
+            self.yspeed += self.yaccel
             #destroy if leaves window
             if(self.rect.left   > WINDOWWIDTH  or
                self.rect.right  < 0            or

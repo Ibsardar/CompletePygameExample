@@ -1,10 +1,13 @@
 """ Flame.py
     by Ibrahim Sardar
+
+    WARNING: very messy and crappy but it does what I want !!!
 """
 
 #general housekeeping
-import pygame, math, random, Block
+import pygame, math, random, Block, Bullet
 from Block import Block
+from Bullet import Bullet
 pygame.init()
 #window
 WINDOWWIDTH  = 720
@@ -18,6 +21,7 @@ class Flame(Block):
         pygame.sprite.Sprite.__init__(self)
         self.setImage(w, h)
         self.color = color
+        self.dmg = 0
         
         self.dir   = 0.0 #accurate angle
         self.x_acc = 0.0 #accurate x pos
@@ -28,6 +32,13 @@ class Flame(Block):
         self.yspeed = 0.0 #accurate y vel
         self.xaccel = 0.0 #accurate x accel
         self.yaccel = 0.0 #accurate y accel
+
+        self.event2 = False
+        self.origSize = (w, h) #original size
+        self.waccel   = 0.0 #accurate width accel
+        self.haccel   = 0.0 #accurate height accel
+        self.margin   = 0.0 #accurate angle margin
+        self.bullets  = None
 
     # --- other methods --- #
     def updateEvents(self):
@@ -49,6 +60,47 @@ class Flame(Block):
                self.rect.top    > WINDOWHEIGHT):
 
                 self.kill()
+        #flame size
+        if self.event2 == True:
+            #decrease size
+            self.changeSize(self.rect.w + self.waccel, self.rect.h + self.haccel)
+            #split into 2 halves if size is half IFF size is not 0
+            wlimit = self.origSize[0]/1.1
+            hlimit = self.origSize[1]/1.1
+            
+            if self.rect.w <= 6 or self.rect.h <= 6:
+                self.kill()
+                rnd = random.randint(0,300)
+                if rnd == 1:
+                    crnd = random.randint(0,200)
+                    srnd = random.randint(2,5)
+                    smoke = Bullet( (crnd,crnd,crnd), srnd,srnd)
+                    smoke.load(self, self.bullets)
+                    smoke.aim(self.dir, self.margin)
+                    smoke.fire(1)
+                    smoke.yaccel = 0
+                    
+            elif self.rect.w <= wlimit and self.rect.h <= hlimit:
+                #prepare some variables
+                speed = int(math.sqrt( (self.xspeed**2) + (self.yspeed**2) ))
+                color = self.incrementColor()
+                self.margin += 15
+                #make 2 more flames
+                flame = Flame(color, wlimit, hlimit)
+                flame.load(self, self.bullets)
+                flame.aim(70, self.margin)
+                flame.throw(speed, self.xaccel, self.yaccel, self.waccel, self.haccel) #--1
+                flame = Flame(color, wlimit, hlimit)
+                flame.load(self, self.bullets)
+                flame.aim(110, self.margin)
+                flame.throw(speed, self.xaccel, self.yaccel, self.waccel, self.haccel) #--2
+
+    def incrementColor(self):
+        #increases G of RGB by 50
+        G = self.color[1] + 50
+        if G > 255:
+            G = 255
+        return (self.color[0], G, self.color[2])
 
     def setCenterPos(self, xPos, yPos):
         self.rect.centerx = self.x_acc = xPos
@@ -57,25 +109,35 @@ class Flame(Block):
     def load(self, block, group):
         self.setCenterPos(block.rect.centerx, block.rect.centery)
         group.add(self)
+        #update current bullet group for this class
+        self.bullets = group
 
     def aim(self, angle, margin):
+        #FIRST, set self's margin
+        self.margin = margin
         #the big number allows many decimal places
         margin = margin * 100000000
         angle = angle * 100000000
         self.dir = random.randint(angle-margin, angle+margin)/100000000
+        
 
-    def throw(self, speed, yaccel):
+    def throw(self, speed, xaccel, yaccel, waccel, haccel):
+        #randomize speed a bit:
+        speed = random.randint(speed*1000-700, speed*1000+2300)/1000
         #convert angle to radians
         dir_rad = math.radians(self.dir)
         
         dx = math.cos(dir_rad) * speed
         dy = math.sin(dir_rad) * speed
+        
+        self.xaccel = xaccel
+        self.yaccel = -yaccel
+        self.waccel = waccel
+        self.haccel = haccel
 
-        self.yaccel = math.sin(dir_rad) * -yaccel
-
+        self.event2 = True
         self.moveX( dx )
         self.moveY( dy )
-
 
 
 

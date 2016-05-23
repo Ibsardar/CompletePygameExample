@@ -220,20 +220,6 @@ def main():
                 elif event.key == K_LEFT:
                     player.moveX(-4)
                 if event.key == K_SPACE:
-                    """  ~~~~~~~ JUNK ~~~~~~~~
-                      "  |>  IF 0.25 SEC HAVE PASSED SINCE LAST SHOT:
-                      " _______________________________
-                      "| ~~~~~~~ create bullet ~~~~~~~ |
-                      "| bullet dimensions:   [4x8]    |
-                      "| bullet color:   RED           |
-                      "| ~~~~ add bullet to group ~~~~ |
-                      "| bullet's pos:   player's pos  |
-                      "| bullet angle:   75-105 degs   |
-                      "| bullet speed:   6            //
-                      "|____________________________///
-                      "
-                      "  ~~~~~~~ JUNK ~~~~~~~~
-                    """
                     player.shoot( playerBullets, asteroids, fps )
                 if event.key == K_1:
                     player.selected = 0
@@ -260,26 +246,21 @@ def main():
                     player.stopShooting()
 
         #timers------------------------------------------------------------------------------------------|
-        """#limit shots to 1 shot per 0.25 sec
-        if bulletTimer != 0:
-            if  bulletTimer < fps/4:
-                bulletTimer += 1   
-            else:
-                bulletTimer = 0"""
+        #...
         
         #collision handling------------------------------------------------------------------------------|
         #if player touches any enemy
         for ast in asteroids:
             if player.rect.colliderect( ast ):
                 print("Points:  ", player.points)
-                endGame()
+                #endGame()!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!testing!!!
         #if bullet touches enemy
         for ast in asteroids:
             for bullet in playerBullets:
                 if bullet.rect.colliderect( ast ):
+                    player.points += ast.getPoints()
                     ast.kill()
                     bullet.kill()
-                    player.points += ast.getPoints()
         
         #update------------------------------------------------------------------------------------------|
         #NOTE: last thing updated will be in "top" layer

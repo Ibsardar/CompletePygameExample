@@ -26,8 +26,8 @@ class Block(pygame.sprite.Sprite):
 
     # --- update method --- #
     def update(self):
-        windowSurface.blit(self.image, (self.rect.x, self.rect.y))
         self.image.fill(self.color)
+        windowSurface.blit(self.image, (self.rect.x, self.rect.y))
         self.updateEvents()
 
     # --- other methods --- #
@@ -44,11 +44,9 @@ class Block(pygame.sprite.Sprite):
         self.image = pygame.Surface( (xsize, ysize) )
         self.rect  = self.image.get_rect()
 
-    def changeSize(self, size):
+    def changeSize(self, w, h):
         xP = self.rect.centerx
         yP = self.rect.centery
-        w  = size
-        h  = size
         self.setImage(w, h)
         self.rect.centerx = xP
         self.rect.centery = yP

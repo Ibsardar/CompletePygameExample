@@ -45,6 +45,7 @@ class Player(Block):
         self.yspeed = 0
 
         self.event2 = False
+        self.event3 = False
         self.timer  = 0
         self.alarm  = 0
 
@@ -118,15 +119,24 @@ class Player(Block):
                 self.stopY()
                 self.rect.bottom = WINDOWHEIGHT
                 
-        #shooting (shooter lvl 3)
+        #shooting (lvl 3)
         if self.event2 == True:
             #shoot a bullet
             if self.timer == 0:
                 self.timer += 1
                 bullet = Bullet(BLACK, 4, 8)
                 bullet.load(self, self.bullets)
-                bullet.aim(90, 15)
-                bullet.fire(14)
+                bullet.aim(90, 1)
+                bullet.fire(18)
+
+        #sprayer (lvl 2)
+        if self.event3 == True:
+            if self.timer == 0:
+                self.timer += 1
+                flame = Flame(RED, 15,11)
+                flame.load(self, self.bullets)
+                flame.aim(90, 25)
+                flame.throw(16, 0, -0.1, -0.1, -0.1)
 
     # --- END UPDATING EVENTS --- #
     
@@ -173,8 +183,8 @@ class Player(Block):
             elif self.unlocked[0] == 3:
                 #update bullet group for self
                 self.bullets = bullets
-                #allow a shot every 1/15 sec
-                self.alarm = int(fps/15)
+                #allow a shot every 1/30 sec
+                self.alarm = int(fps/30)
                 #allow holding down to keep shooting
                 self.event2 = True
 
@@ -215,26 +225,12 @@ class Player(Block):
 
             #lvl 2
             elif self.unlocked[2] == 2:
-                #allow a shot every 1/2 sec
-                self.alarm = fps/2
-                #shoot 3 flames
-                #   >>>(DO: make a Flame class in the file: Flame.py)
-                #   >>>(DO: shoot few large bullets then duplicate the larges ones into smaller and smaller ones till they become too small OR their acceleration has become 0)
-                #   >>>(DO: change color according to size of bullet)
-                if self.timer == 0:
-                    self.timer += 1
-                    flame = Flame(RED, 12, 12)
-                    flame.load(self, bullets)
-                    flame.aim(87, 3)
-                    flame.throw(16, -0.5)
-                    flame = Flame(RED, 12, 12)
-                    flame.load(self, bullets)
-                    flame.aim(90, 3)
-                    flame.throw(16, -0.5)
-                    flame = Flame(RED, 12, 12)
-                    flame.load(self, bullets)
-                    flame.aim(93, 3)
-                    flame.throw(16, -0.5)
+                #update bullet group for self
+                self.bullets = bullets
+                #allow a shot every 1/15 sec
+                self.alarm = int(fps/15)
+                #allow holding down to keep shooting
+                self.event3 = True
 
             #lvl 3
             elif self.unlocked[2] == 3:
@@ -262,6 +258,7 @@ class Player(Block):
 
     def stopShooting(self):
         self.event2 = False
+        self.event3 = False
             
 
 
