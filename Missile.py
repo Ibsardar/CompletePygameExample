@@ -25,6 +25,7 @@ class Missile(Bullet):
         self.dmg = 0
         
         self.dir   = 0
+        self.rot   = 0
         self.x_acc = 0.0 #accurate x pos
         self.y_acc = 0.0 #accurate y pos
 
@@ -36,6 +37,9 @@ class Missile(Bullet):
         
         self.bullets = None
         self.baddies = None
+        self.target  = None
+
+        self.wobble = 0
 
     # --- other methods --- #
     def updateEvents(self):
@@ -50,6 +54,9 @@ class Missile(Bullet):
             #update speed
             self.xspeed += self.xaccel
             self.yspeed += self.yaccel
+            #normalize xa of missile if not homing
+            if self.target == None:
+                self.decXAccel(.1)
             #destroy if leaves window
             if(self.rect.left   > WINDOWWIDTH  or
                self.rect.right  < 0            or
@@ -60,9 +67,38 @@ class Missile(Bullet):
         #trail
         self.trail()
 
+    def decXAccel(self, dec):
+        if self.xaccel > -dec and self.xaccel < dec:
+            self.xaccel = 0
+        if self.xaccel > 0:
+            self.xaccel -= dec
+        elif self.xaccel < 0:
+            self.xaccel += dec
+
     def getGroups(self, bullets, baddies):
         self.bullets = bullets
         self.baddies = baddies
+
+    def putForce(self, angle, mag):
+        dir_rad = math.radians(angle)
+        
+        ddx = math.cos(dir_rad) * mag
+        ddy = math.sin(dir_rad) * mag
+        ddy = -ddy
+
+        self.xaccel += ddx
+        self.yaccel += ddy
+
+    def explode(self, vel0, accel0):
+        """
+        explosion = Bomb(BLACK, 1, 1)
+        explosion.load(self, self.bullets)
+        explosion.explode(start_angle, end_angle, vel0, accel0, margin)
+        """
+        pass
+
+    def find(self):
+        pass
 
     def trail(self):
         flame = FlameV2(YELLOW, 2, 2, 8, 8)

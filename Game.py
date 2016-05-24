@@ -232,6 +232,8 @@ def main():
                 #=CHEATING=====\
                 if event.key == K_UP:
                     player.points += 75
+                if event.key == K_DOWN:
+                    player.unlocked[1] = 2
                 #==============/
                 if event.key == K_RIGHT:
                     player.moveX(4)
@@ -277,7 +279,7 @@ def main():
         for ast in asteroids:
             for bullet in playerBullets:
                 if bullet.rect.colliderect( ast ):
-                    player.points += ast.getPoints()
+                    #player.points += ast.getPoints()
                     ast.kill()
                     bullet.kill()
         

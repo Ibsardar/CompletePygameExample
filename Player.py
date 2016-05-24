@@ -54,6 +54,7 @@ class Player(Block):
 
         self.event2 = False
         self.event3 = False
+        self.event4 = False
         self.timer  = 0
         self.alarm  = 0
 
@@ -134,7 +135,7 @@ class Player(Block):
             if self.timer == 0:
                 self.timer += 1
                 bullet = Bullet(BLACK, 4, 8)
-                bullet.convertToPic(BULLET_DGREY, 1.8)
+                bullet.convertToPic(BULLET_DGREY, 1)
                 bullet.load(self, self.bullets)
                 bullet.aim(90, 1)
                 bullet.fire(18)
@@ -167,6 +168,19 @@ class Player(Block):
                 flame.fire(5)
                 flame.wiggle = True #--5
 
+        #missile (lvl 2)
+        if self.event4 == True:
+            if self.timer == 0:
+                self.timer += 1
+                missile = Missile(PURPLE, 5, 16)
+                missile.convertToPic(MISSLE_BASIC, 1)
+                missile.load(self, self.bullets)
+                missile.getGroups(self.bullets, self.baddies)
+                missile.aim(90, 15)
+                missile.fire(1)
+                missile.putForce(missile.dir, 0.1)
+                    
+
     # --- END UPDATING EVENTS --- #
     
 
@@ -192,7 +206,7 @@ class Player(Block):
                 if self.timer == 0:
                     self.timer += 1
                     bullet = Bullet(DGREY, 4, 8)
-                    bullet.convertToPic(BULLET_LGREY, 1.8)
+                    bullet.convertToPic(BULLET_LGREY, 1)
                     bullet.load(self, bullets)
                     bullet.aim(90, 5)
                     bullet.fire(6)
@@ -205,7 +219,7 @@ class Player(Block):
                 if self.timer == 0:
                     self.timer += 1
                     bullet = Bullet(DDGREY, 4, 8)
-                    bullet.convertToPic(BULLET_GREY, 1.8)
+                    bullet.convertToPic(BULLET_GREY, 1)
                     bullet.load(self, bullets)
                     bullet.aim(90, 10)
                     bullet.fire(10)
@@ -239,15 +253,20 @@ class Player(Block):
                 if self.timer == 0:
                     self.timer += 1
                     missile = Missile(PURPLE, 5, 16)
-                    missile.convertToPic(MISSLE_BASIC, 1.7)
+                    missile.convertToPic(MISSLE_BASIC, 1)
                     missile.load(self, bullets)
                     missile.getGroups(bullets, baddies)
                     missile.aim(90, 3)
-                    missile.fire(3)
+                    missile.fire(1)
 
             #lvl 2
             elif self.unlocked[1] == 2:
-                pass
+                #update bullet group for self
+                self.bullets = bullets
+                #allow a shot every 1/4 sec
+                self.alarm = int(fps/4)
+                #allow holding down to keep shooting
+                self.event4 = True
 
             #lvl 3
             elif self.unlocked[1] == 3:
@@ -321,6 +340,7 @@ class Player(Block):
     def stopShooting(self):
         self.event2 = False
         self.event3 = False
+        self.event4 = False
             
 
 
