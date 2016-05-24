@@ -1,7 +1,8 @@
 """ Flame.py
     by Ibrahim Sardar
 
-    WARNING: very messy and crappy but it does what I want !!!
+    WARNING: very messy and crappy !!!
+    WARNING: This file is un-used. Go to FlameV2.py
 """
 
 #general housekeeping

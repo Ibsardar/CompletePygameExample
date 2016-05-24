@@ -19,6 +19,7 @@ class Block(pygame.sprite.Sprite):
         self.setImage(xsize, ysize)
         self.setCenterPos(xCenterPos, yCenterPos)
         self.color = color
+        self.isPic = False
 
         self.event1 = False
         self.xspeed = 0
@@ -26,7 +27,8 @@ class Block(pygame.sprite.Sprite):
 
     # --- update method --- #
     def update(self):
-        self.image.fill(self.color)
+        if self.isPic == False:
+            self.image.fill(self.color)
         windowSurface.blit(self.image, (self.rect.x, self.rect.y))
         self.updateEvents()
 
@@ -35,21 +37,38 @@ class Block(pygame.sprite.Sprite):
         #Use this when you want some action to be
         # continuous. (any press & hold action)
         pass
+
+    def convertToPic(self, pic, scale):
+        self.isPic = True
+        oldCenter = self.rect.center
+        self.image = pygame.image.load( pic ).convert_alpha()
+        self.image = pygame.transform.rotozoom(self.image, 0, scale)
+        self.rect  = self.image.get_rect()
+        self.rect.center = oldCenter
+
+    def setImage(self, xsize, ysize):
+        #use if isPic == False
+        self.image = pygame.Surface( (xsize, ysize) )
+        self.rect = self.image.get_rect()
     
     def setCenterPos(self, xPos, yPos):
         self.rect.centerx = xPos
         self.rect.centery = yPos
 
-    def setImage(self, xsize, ysize):
-        self.image = pygame.Surface( (xsize, ysize) )
-        self.rect  = self.image.get_rect()
-
     def changeSize(self, w, h):
-        xP = self.rect.centerx
-        yP = self.rect.centery
+        #use if isPic == False
+        xtemp = self.rect.centerx
+        ytemp = self.rect.centery
         self.setImage(w, h)
-        self.rect.centerx = xP
-        self.rect.centery = yP
+        self.rect.centerx = xtemp
+        self.rect.centery = ytemp
+
+    def rotate(self, angle):
+        oldCenter = self.rect.center
+        self.image = pygame.transform.rotate(self.image, angle)
+        self.image = self.image.convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.center = oldCenter
 
     # *NOTE*  this makes positive speed 'up' and vice versa
     def moveY(self, speed):

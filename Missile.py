@@ -1,24 +1,27 @@
-""" Bullet.py
+""" Missile.py
     by Ibrahim Sardar
 """
 
 #general housekeeping
-import pygame, math, random, Block
-from Block import Block
+import pygame, math, random, Bullet, FlameV2
+from Bullet import Bullet
+from FlameV2 import FlameV2
 pygame.init()
 #window
 WINDOWWIDTH  = 720
 WINDOWHEIGHT = 380
+#color
+YELLOW = (255, 255,   0)
 
 #Bullet
-class Bullet(Block):
+class Missile(Bullet):
     #initializer
     def __init__(self, color, w, h):
         #attributes
         pygame.sprite.Sprite.__init__(self)
         self.setImage(w, h)
         self.color = color
-        self.isPic = False
+        self.isPic = True
         self.dmg = 0
         
         self.dir   = 0
@@ -30,6 +33,9 @@ class Bullet(Block):
         self.yspeed = 0
         self.xaccel = 0
         self.yaccel = 0
+        
+        self.bullets = None
+        self.baddies = None
 
     # --- other methods --- #
     def updateEvents(self):
@@ -51,35 +57,18 @@ class Bullet(Block):
                self.rect.top    > WINDOWHEIGHT):
 
                 self.kill()
+        #trail
+        self.trail()
 
-    def setCenterPos(self, xPos, yPos):
-        self.rect.centerx = self.x_acc = xPos
-        self.rect.centery = self.y_acc = yPos
+    def getGroups(self, bullets, baddies):
+        self.bullets = bullets
+        self.baddies = baddies
 
-    def load(self, block, group):
-        half = int(self.rect.width/2) - 1
-        xrnd = random.randint( block.rect.centerx - half, block.rect.centerx + half )
-        self.setCenterPos(xrnd, block.rect.centery)
-        group.add(self)
-
-    def aim(self, angle, margin):
-        #the big number allows many decimal places
-        margin = round(margin * 100000000)
-        angle  = round(angle * 100000000)
-        self.dir = random.randint(angle-margin, angle+margin)/100000000
-        #rotate missile to its direction
-        self.rotate(self.dir - 90)
-
-    def fire(self, speed):
-        #convert angle to radians
-        dir_rad = math.radians(self.dir)
-        
-        dx = math.cos(dir_rad) * speed
-        dy = math.sin(dir_rad) * speed
-
-        self.moveX( dx )
-        self.moveY( dy )
-
+    def trail(self):
+        flame = FlameV2(YELLOW, 2, 2, 8, 8)
+        flame.load(self, self.bullets, 'C')
+        flame.aim(self.dir-180, 3)
+        flame.fire(2)
 
 
 

@@ -18,6 +18,7 @@ class Enemy(Block):
         pygame.sprite.Sprite.__init__(self)
         self.setImage(w, h)
         self.color = color
+        self.isPic = False
 
         self.event1 = False
         self.xspeed = 0

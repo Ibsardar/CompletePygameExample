@@ -3,10 +3,11 @@
 """
 
 #general housekeeping
-import pygame, math, random, Block, Bullet, Flame
+import pygame, math, random, Block, Bullet, FlameV2, Missile
 from Block import Block
 from Bullet import Bullet
-from Flame import Flame
+from FlameV2 import FlameV2
+from Missile import Missile
 pygame.init()
 #window
 WINDOWWIDTH  = 720
@@ -27,15 +28,22 @@ BROWN  = (102,  51,   0)
 PURPLE = (102,   0, 102)
 YELLOW = (255, 255,   0)
 FIRE   = (193, 105,  16)
+#pictures
+BULLET_LGREY = "Graphics/Bullet01.png"
+BULLET_GREY  = "Graphics/Bullet02.png"
+BULLET_DGREY = "Graphics/Bullet03.png"
+MISSLE_BASIC = "Graphics/Missile02.png"
+MISSLE_HEAVY = "Graphics/Missile01.png"
 
 #Player
 class Player(Block):
     #initializer
-    def __init__(self, color, w, h):
+    def __init__(self, color=BLACK, w=0, h=0):
         #attributes
         pygame.sprite.Sprite.__init__(self)
         self.setImage(w, h)
         self.color = color
+        self.isPic = False
 
         self.baddies = None
         self.bullets = None
@@ -50,13 +58,13 @@ class Player(Block):
         self.alarm  = 0
 
         #The player's choice of weapons... (5 choices each w/ 3 upgrades)
-        #[ shooter, missle, sprayer, minions, bombs ]
+        #[ shooter, missile, sprayer, minions, bombs ]
         """ shooter:    <pts | 0, 175, 300>
                 1: shooter
                 2: machine gun
                 3: gatling gun
-            missle:     <pts | 100, 400, 700>
-                1: missle launcher
+            missile:     <pts | 100, 400, 700>
+                1: missile launcher
                 2: auto launcher
                 3: auto seeker
             sprayer:    <pts | 150, 350, 900>
@@ -78,8 +86,9 @@ class Player(Block):
 
     # --- update method --- #
     def update(self):
+        if self.isPic == False:
+            self.image.fill(self.color)
         windowSurface.blit(self.image, (self.rect.x, self.rect.y))
-        self.image.fill(self.color)
         self.updateEvents()
         #limit shots per frame
         if self.timer != 0:
@@ -125,6 +134,7 @@ class Player(Block):
             if self.timer == 0:
                 self.timer += 1
                 bullet = Bullet(BLACK, 4, 8)
+                bullet.convertToPic(BULLET_DGREY, 1.8)
                 bullet.load(self, self.bullets)
                 bullet.aim(90, 1)
                 bullet.fire(18)
@@ -133,10 +143,29 @@ class Player(Block):
         if self.event3 == True:
             if self.timer == 0:
                 self.timer += 1
-                flame = Flame(RED, 15,11)
-                flame.load(self, self.bullets)
-                flame.aim(90, 25)
-                flame.throw(16, 0, -0.1, -0.1, -0.1)
+                flame = FlameV2(YELLOW, 6, 6, 24, 24)
+                flame.load(self, self.bullets, 'N')
+                flame.aim(90, 30)
+                flame.fire(5)
+                flame.wiggle = True #--1
+                flame = FlameV2(YELLOW, 6, 6, 24, 24)
+                flame.load(self, self.bullets, 'N')
+                flame.aim(100, 30)
+                flame.fire(5)       #--2
+                flame = FlameV2(YELLOW, 6, 6, 24, 24)
+                flame.load(self, self.bullets, 'N')
+                flame.aim(80, 30)
+                flame.fire(5)       #--3
+                flame = FlameV2(YELLOW, 6, 6, 24, 24)
+                flame.load(self, self.bullets, 'N')
+                flame.aim(95, 15)
+                flame.fire(5)
+                flame.wiggle = True #--4
+                flame = FlameV2(YELLOW, 6, 6, 24, 24)
+                flame.load(self, self.bullets, 'N')
+                flame.aim(85, 15)
+                flame.fire(5)
+                flame.wiggle = True #--5
 
     # --- END UPDATING EVENTS --- #
     
@@ -163,6 +192,7 @@ class Player(Block):
                 if self.timer == 0:
                     self.timer += 1
                     bullet = Bullet(DGREY, 4, 8)
+                    bullet.convertToPic(BULLET_LGREY, 1.8)
                     bullet.load(self, bullets)
                     bullet.aim(90, 5)
                     bullet.fire(6)
@@ -175,6 +205,7 @@ class Player(Block):
                 if self.timer == 0:
                     self.timer += 1
                     bullet = Bullet(DDGREY, 4, 8)
+                    bullet.convertToPic(BULLET_GREY, 1.8)
                     bullet.load(self, bullets)
                     bullet.aim(90, 10)
                     bullet.fire(10)
@@ -192,9 +223,40 @@ class Player(Block):
                 print("Error: player is trying to shoot with an incorrect weapon selection")
                 return -2
             
-        #missle
+        #missile
         elif self.selected == 1:
-            pass
+            
+            #locked
+            if self.unlocked[1] == 0:
+                print("Warning: missile is not unlocked yet")
+                return -1
+            
+            #lvl 1
+            elif self.unlocked[1] == 1:
+                #allow a shot every 1/2 sec
+                self.alarm = int(fps/2)
+                #shoot a missile
+                if self.timer == 0:
+                    self.timer += 1
+                    missile = Missile(PURPLE, 5, 16)
+                    missile.convertToPic(MISSLE_BASIC, 1.7)
+                    missile.load(self, bullets)
+                    missile.getGroups(bullets, baddies)
+                    missile.aim(90, 50)
+                    missile.fire(3)
+
+            #lvl 2
+            elif self.unlocked[1] == 2:
+                pass
+
+            #lvl 3
+            elif self.unlocked[1] == 3:
+                pass
+
+            else:
+                print("Error: player is trying to shoot with an incorrect weapon selection")
+                return -2
+            
         #sprayer
         elif self.selected == 2:
 
