@@ -242,7 +242,7 @@ class Player(Block):
                     missile.convertToPic(MISSLE_BASIC, 1.7)
                     missile.load(self, bullets)
                     missile.getGroups(bullets, baddies)
-                    missile.aim(90, 50)
+                    missile.aim(90, 3)
                     missile.fire(3)
 
             #lvl 2

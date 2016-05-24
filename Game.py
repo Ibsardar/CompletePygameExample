@@ -46,12 +46,21 @@ PURPLE = (102,   0, 102)
 YELLOW = (255, 255,   0)
 FIRE   = (193, 105,  16)
 
+#pictures
+SHIP_PLAYER = "Graphics/Ship.png"
+AST_SMALL   = "Graphics/Asteroid02.png"
+AST_MED     = "Graphics/Asteroid01.png"
+AST_BIG     = "Graphics/Asteroid03.png"
+BG_START    = "Graphic s/Wallpaper01.png"
+BG_GAME     = "Graphics/Wallpaper02.png"
+
 #window
 WINDOWWIDTH   = 720
 WINDOWHEIGHT  = 380
 WINDOWCENTER  = (WINDOWWIDTH/2, WINDOWHEIGHT/2)
 windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 pygame.display.set_caption("Game Example")
+bg_game = pygame.image.load(BG_GAME)
 
 #clock
 clock = pygame.time.Clock()
@@ -60,16 +69,24 @@ clock = pygame.time.Clock()
 def makeAsteroids( speed, counter, group ):
     
     if counter == 0:
-        #setting width, height, x-pos, y-pos, velocity(vertical)
-        wrnd = random.randint(12, 36)
-        hrnd = random.randint(12, 36)
-        xrnd = random.randint(wrnd, WINDOWWIDTH-wrnd)
-        y    = -hrnd
-        vrnd = random.randint(1, 5)
+        #   THIS IS ONLY IF NO GRAPHICS ARE USED:
+        ###wrnd = random.randint(12, 36)
+        ###hrnd = random.randint(12, 36)
         
-        asteroid = Enemy( BLACK, wrnd, hrnd )
+        #setting asteroid, x-pos, y-pos, velocity(vertical)
+        vyrnd = random.randint(1, 4)
+        vxrnd = random.randint(0, 2)
+        arnd  = random.choice( [AST_SMALL,AST_SMALL,AST_SMALL,AST_MED,AST_MED,AST_BIG] )
+        
+        asteroid = Enemy( BLACK, 0, 0 )
+        asteroid.convertToPic(arnd, 1)
+        asteroid.rotate( random.randint(0,359) )
+        xrnd = random.randint(asteroid.rect.w, WINDOWWIDTH-asteroid.rect.w)
+        y    = -asteroid.rect.h
+        
         asteroid.setCenterPos( xrnd, y )
-        asteroid.moveY( -vrnd )
+        asteroid.moveY( -vyrnd )
+        asteroid.moveX(  vxrnd )
         group.add( asteroid )
         counter += 1
 
@@ -175,6 +192,7 @@ def main():
     #player(color, width, height),
     # \-> center of player:( WINDOWWIDTH/2, 350 )
     player = Player( BLUE, 16, 16 )
+    player.convertToPic(SHIP_PLAYER, 1)
     player.setCenterPos( WINDOWWIDTH/2, 350 )
 
     #group of all player bullets
@@ -252,6 +270,7 @@ def main():
         #if player touches any enemy
         for ast in asteroids:
             if player.rect.colliderect( ast ):
+                ast.kill()
                 print("Points:  ", player.points)
                 #endGame()!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!testing!!!
         #if bullet touches enemy
@@ -264,7 +283,7 @@ def main():
         
         #update------------------------------------------------------------------------------------------|
         #NOTE: last thing updated will be in "top" layer
-        windowSurface.fill(GREY)
+        windowSurface.blit(bg_game, (0,0))
         playerBullets.update()
         player.update()
         asteroids.update()
