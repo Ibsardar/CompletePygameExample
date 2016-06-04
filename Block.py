@@ -25,6 +25,9 @@ class Block(pygame.sprite.Sprite):
         self.xspeed = 0
         self.yspeed = 0
 
+        #------junk***
+        self.ph = False
+
     # --- update method --- #
     def update(self):
         if self.isPic == False:
@@ -38,12 +41,21 @@ class Block(pygame.sprite.Sprite):
         # continuous. (any press & hold action)
         pass
 
-    def convertToPic(self, pic, scale):
+    def convertToPic(self, pic, scale=1):
         self.isPic = True
         oldCenter = self.rect.center
         self.image = pygame.image.load( pic ).convert_alpha()
-        self.image = pygame.transform.rotozoom(self.image, 0, scale)
+        if scale != 1:
+            self.image = pygame.transform.rotozoom(self.image, 0, scale)
         self.rect  = self.image.get_rect()
+        self.rect.center = oldCenter
+
+    def convertToColor(self, color, w, h):
+        self.isPic = False
+        self.color = color
+        
+        oldCenter = self.rect.center
+        self.setImage(w,h)
         self.rect.center = oldCenter
 
     def setImage(self, xsize, ysize):
@@ -64,6 +76,7 @@ class Block(pygame.sprite.Sprite):
         self.rect.centery = ytemp
 
     def rotate(self, angle):
+        #image becomes low quality
         oldCenter = self.rect.center
         self.image = pygame.transform.rotate(self.image, angle)
         self.image = self.image.convert_alpha()

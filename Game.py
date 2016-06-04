@@ -3,6 +3,18 @@
 
     Python 3.3.5
     Pygame 1.9.2a0
+
+    Notes:  This game is SUPER MESSY, UNORGANIZED, and LACKING A SOLID GAME ENGINE!
+            I intended this game to be at least 100 times simpler than it is now,
+            I guess I got a bit carried away. :)
+            
+            Also note that it is not really complete; it got so messy at one point
+            that I just felt like starting a new, fresh project would be much more
+            beneficial than putting more brute-force into this chaotic game.
+
+            ** press UP arrow key to cheat **
+            
+            Anyways, HAVE FUN!
 """
 
 #load
@@ -10,22 +22,16 @@ import pygame
 from   pygame.locals import *
 
 import sys
-
 import time
-
 import random
 
-import Block
 from Block import Block
-
-import Player
 from Player import Player
-
-import Bullet
 from Bullet import Bullet
-
-import Enemy
 from Enemy import Enemy
+from MissileV3 import MissileV3
+from Bomb import Bomb
+from Minion import Minion
 #-END LOAD-#
 
 #init
@@ -75,7 +81,7 @@ def makeAsteroids( speed, counter, group ):
         
         #setting asteroid, x-pos, y-pos, velocity(vertical)
         vyrnd = random.randint(1, 4)
-        vxrnd = random.randint(0, 2)
+        vxrnd = (random.randint(0, 40)/10)-2
         arnd  = random.choice( [AST_SMALL,AST_SMALL,AST_SMALL,AST_MED,AST_MED,AST_BIG] )
         
         asteroid = Enemy( BLACK, 0, 0 )
@@ -117,8 +123,15 @@ def endGame():
     sys.exit()
 
 #showPoints
-def showPoints( points ):
+def showPoints( player ):
+    health = player.health
+    points = player.points
     font = pygame.font.SysFont("miriamfixed", 12)
+
+    string = "Health: " + str(health)
+    label = font.render(string, 1, BLACK)
+    windowSurface.blit(label, (WINDOWWIDTH-82, 6) )
+    
     string = "Points: " + str(points)
     label = font.render(string, 1, BLACK)
     windowSurface.blit(label, (6, 6) )
@@ -186,9 +199,6 @@ def main():
     #game fps
     fps = 60
 
-    #sprite group should look like:   [playerBullets][player]
-    spriteGroup = pygame.sprite.Group()
-
     #player(color, width, height),
     # \-> center of player:( WINDOWWIDTH/2, 350 )
     player = Player( BLUE, 16, 16 )
@@ -202,8 +212,8 @@ def main():
     asteroids = pygame.sprite.Group()
 
     #the speed in which the number of asteroids increases (speed/fps = # of sec)
-    # > 0.6 sec
-    speed = 36
+    # -> 1 sec
+    speed = int(fps)
 
     #counts how many times the game loop has looped
     asteroidTimer = 0
@@ -211,12 +221,27 @@ def main():
     
     #game loop
     while(True):
-        
-        #add asteroid every 1 sec
-        asteroidTimer = makeAsteroids( speed, asteroidTimer, asteroids )
 
-        #for press and hold events:
-        pressing = pygame.key.get_pressed()
+        #increase difficulty based on score
+        if player.points < 200:
+            speed = int(fps)
+        elif player.points < 500:
+            speed = int(fps/2)
+        elif player.points < 1000:
+            speed = int(fps/4)
+        elif player.points < 2500:
+            speed = int(fps/6)
+        elif player.points < 5000:
+            speed = int(fps/10)
+        elif player.points < 7500:
+            speed = int(fps/20)
+        elif player.points < 12500:
+            speed = int(fps/30)
+        else:
+            speed = 1 #LAG mode !!
+        
+        #add asteroid every <...> sec
+        asteroidTimer = makeAsteroids( speed, asteroidTimer, asteroids )
         
         #event handling----------------------------------------------------------------------------------|
         for event in pygame.event.get():
@@ -232,8 +257,6 @@ def main():
                 #=CHEATING=====\
                 if event.key == K_UP:
                     player.points += 75
-                if event.key == K_DOWN:
-                    player.unlocked[1] = 2
                 #==============/
                 if event.key == K_RIGHT:
                     player.moveX(4)
@@ -273,15 +296,35 @@ def main():
         for ast in asteroids:
             if player.rect.colliderect( ast ):
                 ast.kill()
-                print("Points:  ", player.points)
-                #endGame()!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!testing!!!
+                player.health -= 10
+                if player.health <= 0:
+                    endGame()
         #if bullet touches enemy
         for ast in asteroids:
             for bullet in playerBullets:
                 if bullet.rect.colliderect( ast ):
-                    #player.points += ast.getPoints()
+                    
+                    if isinstance(bullet, MissileV3):
+                        if bullet.stren == 2:
+                            bullet.explodeLarge()
+                        else:
+                            bullet.explode()
+
+                    if isinstance(bullet, Minion):
+                        if bullet.type == 1:
+                            bullet.explode()
+                            bullet.kill()
+                        elif bullet.type == 2:
+                            bullet.loseHealth(25, player.pop2) #!!!!!!!!!!!!!!!!!!!!!!!!!!!! CHANGE DAMAGE !!!!!!!!!!!
+                        elif bullet.type == 3:
+                            bullet.loseHealth(25, player.pop3)
+
+                    if (isinstance(bullet, Bomb)   == False and
+                        isinstance(bullet, Minion) == False):
+                        bullet.kill()
+                    
+                    player.points += ast.getPoints()
                     ast.kill()
-                    bullet.kill()
         
         #update------------------------------------------------------------------------------------------|
         #NOTE: last thing updated will be in "top" layer
@@ -289,7 +332,7 @@ def main():
         playerBullets.update()
         player.update()
         asteroids.update()
-        showPoints( player.points )
+        showPoints( player )
         updateUnlocked( player )
         pygame.display.update()
 

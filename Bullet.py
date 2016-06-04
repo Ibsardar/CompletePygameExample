@@ -30,6 +30,8 @@ class Bullet(Block):
         self.yspeed = 0
         self.xaccel = 0
         self.yaccel = 0
+        
+        self.event2 = False
 
     # --- other methods --- #
     def updateEvents(self):
@@ -51,6 +53,31 @@ class Bullet(Block):
                self.rect.top    > WINDOWHEIGHT):
 
                 self.kill()
+        #color
+        if self.event2 == True:
+            
+            #color
+            R = self.color[0]
+            G = self.color[1]
+            B = self.color[2]
+
+            #\\ DDBLUE to LLBLUE:
+            R += 1
+            if R > 155:
+                R = 155
+                
+            G += 3
+            if G > 255:
+                G = 255
+                
+            B += 4
+            if B > 255:
+                B = 255
+
+            #update color
+            self.color = ( R , G , B )
+
+            
 
     def setCenterPos(self, xPos, yPos):
         self.rect.centerx = self.x_acc = xPos
@@ -79,6 +106,18 @@ class Bullet(Block):
 
         self.moveX( dx )
         self.moveY( dy )
+
+    def special_01(self):
+        self.event2 = True
+
+    def offset(self, x, y, angle):
+        #offset x and y are when angle is 0
+        #current angle is 'angle'
+
+        #theta = atan2(y,x)
+        #self.x_acc += x
+        #self.y_acc += y
+        pass
 
 
 

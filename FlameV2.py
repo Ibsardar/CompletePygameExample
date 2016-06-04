@@ -1,5 +1,7 @@
 """ FlameV2.py
     by Ibrahim Sardar
+
+    **messy**  an update (V3) is very possible
 """
 
 #general housekeeping
@@ -39,6 +41,14 @@ class FlameV2(Bullet):
         self.burnOut = False
 
         self.wiggle = False
+
+        self.smokeLevel = 0
+
+        self.len = 10
+
+        self.noBlack = False
+        self.noRed = False
+        
     
     # --- other methods --- #
     def updateEvents(self):
@@ -56,22 +66,34 @@ class FlameV2(Bullet):
             #update speed
             self.xspeed += self.xaccel
             self.yspeed += self.yaccel
-            #destroy if leaves window
-            if(self.rect.left   > WINDOWWIDTH  or
-               self.rect.right  < 0            or
-               self.rect.bottom < 0            or
-               self.rect.top    > WINDOWHEIGHT):
+            #destroy if leaves (much past) window
+            if(self.rect.left   > WINDOWWIDTH+50  or
+               self.rect.right  < 0-50            or
+               self.rect.bottom < 0-50            or
+               self.rect.top    > WINDOWHEIGHT+50):
 
                 self.kill()
         #size
         if self.rect.w+1 >= self.w_max or self.rect.h+1 >= self.h_max:
             self.smoke()
-            if self.color == (0,0,0):
+
+            #avoid smoke from becoming black
+            if self.noBlack == True:
+                if(self.color[0] < 100 and
+                   self.color[1] < 100 and
+                   self.color[2] < 100):
+                    self.kill()
+                    
+            #self destruct when black
+            elif self.color == (0,0,0):
                 self.kill()
+                
         elif self.rect.w <= self.rect.h:
             self.changeSize(self.rect.w+1, self.rect.h)
+            
         else:
             self.changeSize(self.rect.w, self.rect.h+1)
+            
         #color
         R = self.color[0]
         G = self.color[1]
@@ -81,19 +103,23 @@ class FlameV2(Bullet):
             grey = int( (R+G+B)/3 )
             #\\ YELLOW to RED
             if R == 255 and G != 0 and self.color[2] == 0:
-                G = self.fadeTo(G, 0, 10)
+                G = self.fadeTo(G, 0, self.len-4)
             #\\ RED to GREY
             else:
-                R = self.fadeTo(R, grey, 15)
-                G = self.fadeTo(G, grey, 15)
-                B = self.fadeTo(B, grey, 15)
+                #kill self if noRed:
+                if self.noRed == True:
+                    self.kill()
+                #fade
+                R = self.fadeTo(R, grey, self.len + 10)
+                G = self.fadeTo(G, grey, self.len + 10)
+                B = self.fadeTo(B, grey, self.len + 10)
             if R == grey and G == grey and B == grey:
                 self.burnOut = True
         else:
             #\\ GREY to BLACK
-            R = self.fadeTo(R, 0, 10)
-            G = self.fadeTo(G, 0, 10)
-            B = self.fadeTo(B, 0, 10)
+            R = self.fadeTo(R, 0, self.len-4)
+            G = self.fadeTo(G, 0, self.len-4)
+            B = self.fadeTo(B, 0, self.len-4)
         self.color = (R, G, B)
 
     def fadeTo(self, n, nTarget, mag):
@@ -130,23 +156,27 @@ class FlameV2(Bullet):
             self.setCenterPos(block.rect.left+block.rect.width, block.rect.centery )
         elif side == 'E':
             self.setCenterPos(block.rect.right-block.rect.width, block.rect.centery )
-        else:
+        elif side == 'C':
             self.setCenterPos(block.rect.centerx, block.rect.centery)
+        else:
+            self.setCenterPos(0, 0)
         #add to main bullet group
         group.add(self)
         #set group for this class
         self.group = group
 
     def smoke(self):
-        hue_rnd = random.randint(115,200)
-        size_rnd = random.randint(int(2*self.w_max/4),self.w_max-1)
-        exist_rnd = random.randint(0,300)
-        color = ( hue_rnd, hue_rnd, hue_rnd )
-        if exist_rnd == 1:
-            smoke = Bullet(color, size_rnd, size_rnd)
-            smoke.load(self, self.group)
-            smoke.aim(90, 75)
-            smoke.fire(1)
+        if self.smokeLevel > 0:
+            hue_rnd = random.randint(115,200)
+            size_rnd = random.randint(int(2*self.w_max/4),self.w_max-1)
+            #highest smoke level = 10000, lowest = 1
+            exist_rnd = random.randint(0,int(10000 / (self.smokeLevel+1) ))
+            color = ( hue_rnd, hue_rnd, hue_rnd )
+            if exist_rnd == 1:
+                smoke = Bullet(color, size_rnd, size_rnd)
+                smoke.load(self, self.group)
+                smoke.aim(90, 75)
+                smoke.fire(1)
 
 
 

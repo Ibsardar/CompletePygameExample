@@ -101,7 +101,7 @@ class Missile(Bullet):
         pass
 
     def trail(self):
-        flame = FlameV2(YELLOW, 2, 2, 8, 8)
+        flame = FlameV2up(YELLOW, 2, 2, 8, 8)
         flame.load(self, self.bullets, 'C')
         flame.aim(self.dir-180, 3)
         flame.fire(2)
